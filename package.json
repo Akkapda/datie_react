@@ -22,10 +22,13 @@
 <<<<<<< HEAD
     "react-router-dom": "^6.26.0",
     "react-scripts": "5.0.1",
+<<<<<<< HEAD
 =======
     "react-router-dom": "^6.26.1",
     "react-scripts": "^5.0.1",
 >>>>>>> c50851e (0819first_push)
+=======
+>>>>>>> 21e6403 (test)
     "styled-components": "^6.1.12",
     "web-vitals": "^2.1.4"
   },

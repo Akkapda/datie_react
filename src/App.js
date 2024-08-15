@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Routes, Route } from "react-router-dom";
 import Paypassword from "./component/pay/Paypassword";
 import IndexMain from "./component/mainIndex/IndexMain";
@@ -45,6 +46,23 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
 >>>>>>> ec01dc8 (second_push_240819)
     </Routes>
+=======
+import RealHeader from "./component/RealHeader"
+import Header from "./component/Header"
+import Footer from "./component/Footer"
+
+function App() {
+  return (
+    <div>
+    <div className="App">
+      <RealHeader/>
+      <Header title={"서브 헤더"}/>
+    </div>
+    <div className="footer">
+      <Footer/> 
+    </div>
+    </div>
+>>>>>>> 21e6403 (test)
   );
 }
 
