@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Routes, Route } from "react-router-dom";
 import Paypassword from "./component/pay/Paypassword";
 import IndexMain from "./component/mainIndex/IndexMain";
@@ -64,6 +65,21 @@ function App() {
     </div>
 >>>>>>> 21e6403 (test)
   );
+=======
+import DiaryDetail from './diary/pages/DiaryDetail';
+import DiaryHome from './diary/pages/DiaryHome';
+import { Routes, Route } from 'react-router-dom';
+
+function App() {
+    return (
+        <div className="App">
+            <Routes>
+                <Route path="/diary" element={<DiaryHome />} />
+                <Route path="/diary/detail" element={<DiaryDetail />} />
+            </Routes>
+        </div>
+    );
+>>>>>>> ad31c67 (20240818)
 }
 
 export default App;

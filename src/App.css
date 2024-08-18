@@ -1,9 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 .App {
 }
 =======
 /* .App {
 } */
 
+=======
+.App {
+    margin-left: 20px;
+    margin-right: 20px;
+    height: max-content;
+  }
+>>>>>>> ad31c67 (20240818)
 
 >>>>>>> 21e6403 (test)
