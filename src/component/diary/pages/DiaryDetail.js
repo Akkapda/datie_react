@@ -1,8 +1,8 @@
 import React, { useReducer, useRef, useEffect, useState } from 'react';
 
-import RealHeader from '../../component/RealHeader';
-import Header from '../../component/Header';
-import Footer from '../../component/Footer';
+import RealHeader from '../../RealHeader';
+import Header from '../../Header';
+import Footer from '../../Footer';
 import KakaoMap from '../components/KakaoMap';
 import DiaryItem from '../components/DiaryItem';
 import DiaryList from '../components/DiaryList';
@@ -43,16 +43,16 @@ function DiaryDetail() {
         },
     ]);
 
-    const geocoder = new kakao.maps.services.Geocoder();
-    geocoder.addressSearch('변환하고싶은주소', function (result, status) {
-        let x = null;
-        let y = null;
-        // 주소가 정상적으로 좌표로 변환되면
-        if (status === kakao.maps.services.Status.OK) {
-            x = result[0].x;
-            y = result[0].y;
-        }
-    });
+    // const geocoder = new kakao.maps.services.Geocoder();
+    // geocoder.addressSearch('변환하고싶은주소', function (result, status) {
+    //     let x = null;
+    //     let y = null;
+    //     // 주소가 정상적으로 좌표로 변환되면
+    //     if (status === kakao.maps.services.Status.OK) {
+    //         x = result[0].x;
+    //         y = result[0].y;
+    //     }
+    // });
 
     const locations = data.map((item) => item.location);
     const placeNames = data.map((item) => item.placeName);
