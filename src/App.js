@@ -1,7 +1,19 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { Routes, Route } from "react-router-dom";
+=======
+import "./App.css";
+import { Routes, Route } from "react-router-dom";
+import CardApplicationComplete from "./component/cardcompletion/CardApplicationComplete";
+import SignUpComponent from "./component/register_first/SignUpForm_first";
+import SignUpForm from "./component/register_second/SignUpForm";
+import CardCreationForm from "./component/cardselection_first/CardCreationForm";
+import ProfileComparison from "./component/cardselection_second/ProfileComparison";
+import CardInfoInput from "./component/cardselection_3/CardInfoInput";
+import LoginPage from "./component/Login/LoginPage";
+>>>>>>> f61c78e (충돌 해결 서현오)
 import Paypassword from "./component/pay/Paypassword";
 import IndexMain from "./component/mainIndex/IndexMain";
 import Payresult from "./component/pay/Payresult";
