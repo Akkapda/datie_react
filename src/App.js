@@ -16,7 +16,6 @@ function App() {
 =======
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
-// 올바른 경로로 수정
 import CardApplicationComplete from "./component/cardcompletion/CardApplicationComplete";
 import SignUpComponent from "./component/register_first/SignUpForm_first";
 import SignUpForm from "./component/register_second/SignUpForm";
@@ -27,6 +26,7 @@ import LoginPage from "./component/Login/LoginPage";
 function App() {
   return (
     <Routes>
+<<<<<<< HEAD
       {/* <Route path="/" element={<SignUpComponent />} /> */}
       {/* <Route path="/" element={<SignUpForm />} /> */}
       {/* <Route path="/" element={<CardCreationForm />} /> */}
@@ -35,6 +35,15 @@ function App() {
       {/* <Route path="/" element={<CardApplicationComplete />} /> */}
       <Route path="/" element={<LoginPage />} />
 >>>>>>> c50851e (0819first_push)
+=======
+      <Route path="/verify" element={<SignUpComponent />} />
+      <Route path="/signup" element={<SignUpForm />} />
+      <Route path="/search_lover" element={<CardCreationForm />} />
+      <Route path="/card_selection" element={<ProfileComparison />} />
+      <Route path="/card_info" element={<CardInfoInput />} />
+      <Route path="/card_complete" element={<CardApplicationComplete />} />
+      <Route path="/login" element={<LoginPage />} />
+>>>>>>> ec01dc8 (second_push_240819)
     </Routes>
   );
 }
