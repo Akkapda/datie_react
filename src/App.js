@@ -6,7 +6,14 @@ function App() {
   return (
 <<<<<<< HEAD
     <Routes>
+<<<<<<< HEAD
       <Route path="/pay/paypassword" element={<Paypassword />} />
+=======
+      <Route path="/" element={<IndexMain />} />
+      <Route path="/loginMain" element={<LoginMain />} />
+      <Route path="/pay/Paypassword" element={<Paypassword />} />
+      <Route path="/pay/Payresult" element={<Payresult />} />
+>>>>>>> c30c8ce (240820 last-1)
     </Routes>
 =======
     <div className="App">
