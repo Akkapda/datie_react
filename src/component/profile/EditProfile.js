@@ -10,11 +10,12 @@ import '../../index.css';
 const EditProfile = () => {
     const { userno } = useParams(); 
     const navigate = useNavigate();
-    
+
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [address, setAddress] = useState('');
     const [detailedAddress, setDetailedAddress] = useState('');
+    const [extraAddress, setExtraAddress] = useState('');
     const [gender, setGender] = useState('');
     const [age, setAge] = useState('');
     const [bankName, setBankName] = useState('');
@@ -33,6 +34,7 @@ const EditProfile = () => {
                 setEmail(data.email);
                 setAddress(data.addr1);
                 setDetailedAddress(data.addr2);
+                setExtraAddress(data.extraAddress);
                 setGender(data.sex);
                 setAge(data.age);
                 setBankName(data.bank);
@@ -44,6 +46,22 @@ const EditProfile = () => {
 
         fetchUserProfile();
     }, [userno]);
+
+    useEffect(() => {
+        // 카카오 주소 검색 API 스크립트 로드
+        const script = document.createElement("script");
+        script.src = "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+        script.async = true;
+        document.head.appendChild(script);
+
+        script.onload = () => {
+            console.log("Daum Postcode script loaded");
+        };
+
+        return () => {
+            document.head.removeChild(script);
+        };
+    }, []);
 
     const handleVerificationRequest = () => {
         setIsVerificationRequested(true);
@@ -61,9 +79,45 @@ const EditProfile = () => {
         }, 1000);
     };
 
+    const handleAddressSearch = () => {
+        if (window.daum && window.daum.Postcode) {
+            new window.daum.Postcode({
+                oncomplete: (data) => {
+                    let addr = ''; // 주소 변수
+                    let extraAddr = ''; // 참고항목 변수
+
+                    if (data.userSelectedType === 'R') {
+                        addr = data.roadAddress;
+                    } else {
+                        addr = data.jibunAddress;
+                    }
+
+                    if (data.userSelectedType === 'R') {
+                        if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
+                            extraAddr += data.bname;
+                        }
+                        if (data.buildingName !== '' && data.apartment === 'Y') {
+                            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                        }
+                        if (extraAddr !== '') {
+                            extraAddr = ' (' + extraAddr + ')';
+                        }
+                    }
+
+                    setAddress(addr);
+                    setExtraAddress(extraAddr);
+                    setDetailedAddress(''); // 상세주소를 빈칸으로 리셋
+                    document.getElementById("detailedAddress").focus(); // 상세주소 입력 필드에 포커스
+                }
+            }).open();
+        } else {
+            console.error('Daum Postcode script is not loaded.');
+        }
+    };
+
     const handleSave = async () => {
         try {
-            await axios.put(`http://localhost:8090/api/profile/${userno}`, {
+            await axios.post(`http://localhost:8090/api/profile/${userno}`, {
                 name,
                 email,
                 addr1: address,
@@ -81,28 +135,6 @@ const EditProfile = () => {
             console.error('Error saving profile data:', error);
             alert('정보 수정 중 오류가 발생했습니다.');
         }
-    };
-
-    const handleAddressSearch = () => {
-        const { kakao } = window;
-    
-        if (!kakao) {
-            alert('카카오 맵 스크립트가 로드되지 않았습니다.');
-            return;
-        }
-    
-        new kakao.maps.services.Geocoder().addressSearch(address, (result, status) => {
-            if (status === kakao.maps.services.Status.OK) {
-                const { road_address } = result[0];
-                if (road_address) {
-                    setAddress(road_address.address_name);
-                } else {
-                    alert('주소를 찾을 수 없습니다.');
-                }
-            } else {
-                alert('주소 검색에 실패했습니다. 상태: ' + status);
-            }
-        });
     };
 
     return (
@@ -170,7 +202,6 @@ const EditProfile = () => {
                 >
                     <MenuItem value="Male">Male</MenuItem>
                     <MenuItem value="Female">Female</MenuItem>
-                    <MenuItem value="Other">Other</MenuItem>
                 </TextField>
                 <TextField
                     id="age"
@@ -206,19 +237,51 @@ const EditProfile = () => {
                         variant="standard"
                         value={accountNumber}
                         onChange={(e) => setAccountNumber(e.target.value)}
-                        sx={{ width: '80%' }}
+                        sx={{ width: '70%' }}
                     />
                     <MuiButton
                         variant="contained"
                         sx={{
                             ml: 2,
-                            backgroundColor: 'primary.main',
-                            color: 'white',
-                            '&:hover': {
-                                backgroundColor: 'primary.dark',
+                            backgroundColor: "rgb(148, 160, 227)",
+                            color: "white",
+                            "&:hover": {
+                                backgroundColor: "rgb(120, 140, 200)",
                             },
+                            width: "125px"
                         }}
-                        onClick={handleSave} // 버튼 클릭 시 호출할 함수
+                        onClick={handleVerificationRequest}
+                    >
+                        인증하기
+                    </MuiButton>
+                </Box>
+                {isVerificationRequested && (
+                    <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
+                        <TextField
+                            id="verificationCode"
+                            label="인증 코드"
+                            variant="standard"
+                            value={verificationCode}
+                            onChange={(e) => setVerificationCode(e.target.value)}
+                            sx={{ width: '70%' }}
+                        />
+                        <Box sx={{ ml: 2 }}>
+                            <span>타이머: {Math.floor(timer / 60)}:{timer % 60 < 10 ? `0${timer % 60}` : timer % 60}</span>
+                        </Box>
+                    </Box>
+                )}
+                {/* 저장 버튼을 중앙에 위치시키기 위한 Box */}
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2 }}>
+                    <MuiButton
+                        variant="contained"
+                        sx={{
+                            backgroundColor: "rgb(148, 160, 227)",
+                            color: "white",
+                            "&:hover": {
+                                backgroundColor: "rgb(120, 140, 200)",
+                            }
+                        }}
+                        onClick={handleSave}
                     >
                         저장
                     </MuiButton>

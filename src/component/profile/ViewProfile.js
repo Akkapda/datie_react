@@ -41,8 +41,9 @@ const ViewProfile = () => {
     };
 
     const handleCardPasswordChange = () => {
-        navigate('/change-cardpassword');
+        navigate(`/changecardpassword/${userno}`);
     };
+    
 
     const handleCardLostReport = () => {
         navigate('/card-lost-report');

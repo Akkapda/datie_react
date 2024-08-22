@@ -1,17 +1,27 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import Header from '../Header'; 
 import Footer from '../Footer';
 import { TextField, Button as MuiButton, Box, Typography } from '@mui/material';
 import './CardPasswordChange.css'; // 스타일 시트 필요에 따라 추가
+import axios from 'axios'; // Axios 추가
 
 const CardPasswordChange = () => {
+    const { userno } = useParams();
+    console.log('Userno from URL:', userno); // 디버깅을 위한 콘솔 로그
+
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const handlePasswordChange = () => {
+    const handlePasswordChange = async () => {
+        if (!userno) {
+            setError('유저 번호가 없습니다.');
+            return;
+        }
+
         if (newPassword.length !== 4 || confirmPassword.length !== 4) {
             setError('비밀번호는 정확히 4자리여야 합니다.');
             return;
@@ -21,11 +31,25 @@ const CardPasswordChange = () => {
             return;
         }
         setError('');
-        // 비밀번호 변경 요청 로직을 여기에 추가합니다.
-        // 예: API 호출
-
-        // 성공 메시지
-        setSuccess('비밀번호가 성공적으로 변경되었습니다.');
+    
+        try {
+            const response = await axios.post(`http://localhost:8090/api/changepassword/${userno}`, {
+                currentPassword,
+                newPassword
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+    
+            setSuccess(response.data);
+        } catch (error) {
+            if (error.response) {
+                setError(error.response.data);
+            } else {
+                setError('비밀번호 변경에 실패했습니다.');
+            }
+        }
     };
 
     return (
