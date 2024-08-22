@@ -1,37 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import Header from '../Header'; 
+import Header from '../Header';
 import Footer from '../Footer';
 import { Button as MuiButton, Typography, Box, Avatar } from '@mui/material';
-import './ViewProfile.css';
-import '../../index.css'; 
+import axios from 'axios';
+import '../../index.css'; // 전역 스타일을 먼저 import
+import './ViewProfile.css'; // 컴포넌트별 스타일을 나중에 import
 
 const ViewProfile = () => {
-    const { email } = useParams();
+    const { userno } = useParams(); // URL 파라미터에서 userno 추출
     const navigate = useNavigate();
-    const userData = {
-        "john@example.com": {
-            name: "John Doe",
-            email: "john@example.com",
-            address: "경기도 마포구 ",
-            detailedAddress: "123단지 ",
-            gender: "Male",
-            age: 30,
-            profilePicture: "https://via.placeholder.com/100",
-            bankName: "KB국민은행",
-            accountNumber: "123-456-7890"
-        },
-        // 추가 사용자 데이터를 여기에 넣을 수 있습니다.
-    };
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    const user = userData[email] || {};
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const url = `http://localhost:8090/api/profile?userno=${userno}`;
+                console.log(`Requesting URL: ${url}`); // 요청 URL 로깅
+                const response = await axios.get(url);
+                setUser(response.data);
+            } catch (error) {
+                console.error('Error fetching user data:', error); // 에러 로깅
+                setError('사용자 데이터를 가져오는 데 실패했습니다.');
+            } finally {
+                setLoading(false);
+            }
+        };
+    
+        fetchUserData();
+    }, [userno]);
 
     const handleEdit = () => {
-        navigate(`/edit-profile/${email}`);
+        navigate(`/edit-profile/${userno}`);
     };
 
     const handleChangePicture = () => {
-        console.log('Change profile picture clicked');
+        console.log('프로필 이미지 변경 클릭');
     };
 
     const handleCardPasswordChange = () => {
@@ -46,14 +52,18 @@ const ViewProfile = () => {
         navigate('/card-cancellation');
     };
 
+    if (loading) return <p>로딩 중...</p>;
+    if (error) return <p>{error}</p>;
+    if (!user) return <p>사용자 정보를 찾을 수 없습니다.</p>;
+
     return (
         <div className="ViewProfile">
-            <Header title="My Profile" />
+            <Header title="내 프로필" />
             <div className="view_profile_container">
                 <Box sx={{ mt: 2, width: '100%', textAlign: 'center' }}>
                     <Avatar
                         alt={user.name}
-                        src={user.profilePicture}
+                        src={user.profilePicture || '/default-avatar.png'}
                         sx={{ width: 100, height: 100, margin: '0 auto' }}
                     />
                     <MuiButton
@@ -65,39 +75,38 @@ const ViewProfile = () => {
                     </MuiButton>
                 </Box>
                 <Box sx={{ mt: 2, width: '100%' }}>
-                    <Typography variant="h6">이름</Typography>
-                    <Typography variant="body1">{user.name}</Typography>
+                    <Typography variant="h6" sx={{ fontFamily: 'Gamja Flower, cursive' }}>이름</Typography>
+                    <Typography variant="body1" sx={{ fontFamily: 'Gamja Flower, cursive' }}>{user.name}</Typography>
                 </Box>
                 <Box sx={{ mt: 2, width: '100%' }}>
-                    <Typography variant="h6">이메일</Typography>
-                    <Typography variant="body1">{user.email}</Typography>
+                    <Typography variant="h6" sx={{ fontFamily: 'Gamja Flower, cursive' }}>유저번호</Typography>
+                    <Typography variant="body1" sx={{ fontFamily: 'Gamja Flower, cursive' }}>{user.userno}</Typography>
                 </Box>
                 <Box sx={{ mt: 2, width: '100%' }}>
-                    <Typography variant="h6">주소</Typography>
-                    <Typography variant="body1">{user.address}</Typography>
+                    <Typography variant="h6" sx={{ fontFamily: 'Gamja Flower, cursive' }}>주소</Typography>
+                    <Typography variant="body1" sx={{ fontFamily: 'Gamja Flower, cursive' }}>{user.addr1}</Typography>
                 </Box>
                 <Box sx={{ mt: 2, width: '100%' }}>
-                    <Typography variant="h6">상세주소</Typography>
-                    <Typography variant="body1">{user.detailedAddress}</Typography>
+                    <Typography variant="h6" sx={{ fontFamily: 'Gamja Flower, cursive' }}>상세주소</Typography>
+                    <Typography variant="body1" sx={{ fontFamily: 'Gamja Flower, cursive' }}>{user.addr2}</Typography>
                 </Box>
                 <Box sx={{ mt: 2, width: '100%' }}>
-                    <Typography variant="h6">성별</Typography>
-                    <Typography variant="body1">{user.gender}</Typography>
+                    <Typography variant="h6" sx={{ fontFamily: 'Gamja Flower, cursive' }}>성별</Typography>
+                    <Typography variant="body1" sx={{ fontFamily: 'Gamja Flower, cursive' }}>{user.sex}</Typography>
                 </Box>
                 <Box sx={{ mt: 2, width: '100%' }}>
-                    <Typography variant="h6">나이</Typography>
-                    <Typography variant="body1">{user.age}</Typography>
+                    <Typography variant="h6" sx={{ fontFamily: 'Gamja Flower, cursive' }}>나이</Typography>
+                    <Typography variant="body1" sx={{ fontFamily: 'Gamja Flower, cursive' }}>{user.age}</Typography>
                 </Box>
                 <Box sx={{ mt: 2, width: '100%' }}>
-                    <Typography variant="h6">은행이름</Typography>
-                    <Typography variant="body1">{user.bankName}</Typography>
+                    <Typography variant="h6" sx={{ fontFamily: 'Gamja Flower, cursive' }}>은행 이름</Typography>
+                    <Typography variant="body1" sx={{ fontFamily: 'Gamja Flower, cursive' }}>{user.bank}</Typography>
                 </Box>
                 <Box sx={{ mt: 2, width: '100%' }}>
-                    <Typography variant="h6">계좌번호</Typography>
-                    <Typography variant="body1">{user.accountNumber}</Typography>
+                    <Typography variant="h6" sx={{ fontFamily: 'Gamja Flower, cursive' }}>계좌번호</Typography>
+                    <Typography variant="body1" sx={{ fontFamily: 'Gamja Flower, cursive' }}>{user.account}</Typography>
                 </Box>
                 <Box sx={{ mt: 3, width: '100%' }}>
-                    {/* 2x2 버튼 레이아웃 */}
                     <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
                         <MuiButton
                             variant="contained"

@@ -45,8 +45,8 @@ function App() {
             <Route path="/card-lost-report-cancellation" element={<CardLostReportCancellation />} />
             <Route path="/card-cancellation" element={<CardCancellation />} />
             <Route path="/change-cardpassword" element={<CardPasswordChange />} />
-            <Route path="/edit-profile/:email" element={<EditProfile />} />
-            <Route path="/view-profile/:email" element={<ViewProfile />} />
+            <Route path="/view-profile/:userno" element={<ViewProfile />} />
+            <Route path="/edit-profile/:userno" element={<EditProfile />} />
             <Route path="/diary" element={<DiaryHome />} />
             <Route path="/diary/detail" element={<DiaryDetail />} />
             <Route path="/" element={<LoginPage />} />

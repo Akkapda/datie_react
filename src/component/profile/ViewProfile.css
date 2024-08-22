@@ -1,19 +1,26 @@
+/* .ViewProfile 클래스를 더 구체적으로 설정 */
 .ViewProfile {
     display: flex;
     flex-direction: column;
     min-height: 100vh; /* 페이지 전체 높이를 채움 */
 }
 
-.view_profile_container {
-    flex: 1; /* 남은 공간을 차지하도록 함 */
+.ViewProfile .view_profile_container {
+    flex: 1;
     padding: 20px;
     background-color: #fff;
     max-width: 600px;
-    margin: 20px auto; /* 중앙 정렬 */
+    margin: 20px auto;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.Footer {
+/* index.css에서의 .view_profile_container */
+.view_profile_container {
+    /* 원하는 스타일 */
+}
+
+/* Footer 스타일 */
+.ViewProfile .footer {
     margin-top: auto; /* Footer를 하단에 고정 */
 }
