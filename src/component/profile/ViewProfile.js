@@ -13,6 +13,7 @@ const ViewProfile = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -36,21 +37,43 @@ const ViewProfile = () => {
         navigate(`/edit-profile/${userno}`);
     };
 
-    const handleChangePicture = () => {
-        console.log('프로필 이미지 변경 클릭');
+    const handleChangePicture = async () => {
+        if (selectedFile) {
+            const formData = new FormData();
+            formData.append('profilePicture', selectedFile);
+
+            try {
+                await axios.post(`http://localhost:8090/api/profile/${userno}/upload`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                // Refresh user data after successful upload
+                const url = `http://localhost:8090/api/profile?userno=${userno}`;
+                const response = await axios.get(url);
+                setUser(response.data);
+                setSelectedFile(null);
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                setError('프로필 이미지를 변경하는 데 실패했습니다.');
+            }
+        }
+    };
+
+    const handleFileChange = (event) => {
+        setSelectedFile(event.target.files[0]);
     };
 
     const handleCardPasswordChange = () => {
         navigate(`/changecardpassword/${userno}`);
     };
-    
 
     const handleCardLostReport = () => {
-        navigate('/card-lost-report');
+        navigate(`/card-lost-report/${userno}`);
     };
 
     const handleCardCancellation = () => {
-        navigate('/card-cancellation');
+        navigate(`/card-cancellation/${userno}`);
     };
 
     if (loading) return <p>로딩 중...</p>;
@@ -67,13 +90,23 @@ const ViewProfile = () => {
                         src={user.profilePicture || '/default-avatar.png'}
                         sx={{ width: 100, height: 100, margin: '0 auto' }}
                     />
-                    <MuiButton
-                        variant="outlined"
-                        sx={{ mt: 1 }}
-                        onClick={handleChangePicture}
-                    >
-                        이미지 변경
-                    </MuiButton>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        id="file-input"
+                        onChange={handleFileChange}
+                    />
+                    <label htmlFor="file-input">
+                        <MuiButton
+                            variant="outlined"
+                            sx={{ mt: 1 }}
+                            component="span"
+                            onClick={handleChangePicture}
+                        >
+                            이미지 변경
+                        </MuiButton>
+                    </label>
                 </Box>
                 <Box sx={{ mt: 2, width: '100%' }}>
                     <Typography variant="h6" sx={{ fontFamily: 'Gamja Flower, cursive' }}>이름</Typography>
@@ -133,7 +166,7 @@ const ViewProfile = () => {
                             }}
                             onClick={handleCardLostReport}
                         >
-                            카드 분실신청
+                            카드 분실 신청/해지
                         </MuiButton>
                         <MuiButton
                             variant="contained"

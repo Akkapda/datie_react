@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; // useNavigate 추가
 import Header from '../Header'; 
 import Footer from '../Footer';
 import { TextField, Button as MuiButton, Box, Typography } from '@mui/material';
@@ -8,6 +8,7 @@ import axios from 'axios'; // Axios 추가
 
 const CardPasswordChange = () => {
     const { userno } = useParams();
+    const navigate = useNavigate(); // useNavigate 훅 사용
     console.log('Userno from URL:', userno); // 디버깅을 위한 콘솔 로그
 
     const [currentPassword, setCurrentPassword] = useState('');
@@ -43,6 +44,10 @@ const CardPasswordChange = () => {
             });
     
             setSuccess(response.data);
+            
+            // 비밀번호 변경 성공 시, 프로필 페이지로 이동
+            navigate(`/view-profile/${userno}`);
+
         } catch (error) {
             if (error.response) {
                 setError(error.response.data);
