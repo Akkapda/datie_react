@@ -1,73 +1,33 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import Header from '../Header';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // 페이지 이동을 위한 useNavigate 훅
+import Header from '../Header'; 
 import Footer from '../Footer';
-import { TextField, Button as MuiButton, Box, MenuItem } from '@mui/material';
-import axios from 'axios';
+import { TextField, Button as MuiButton, Box, MenuItem, Typography } from '@mui/material';
 import './EditProfile.css';
 import '../../index.css';
 
 const EditProfile = () => {
-    const { userno } = useParams(); 
-    const navigate = useNavigate();
-
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [address, setAddress] = useState('');
-    const [detailedAddress, setDetailedAddress] = useState('');
-    const [extraAddress, setExtraAddress] = useState('');
-    const [gender, setGender] = useState('');
-    const [age, setAge] = useState('');
-    const [bankName, setBankName] = useState('');
-    const [accountNumber, setAccountNumber] = useState('');
+    const [name, setName] = useState('John Doe');
+    const [email, setEmail] = useState('john@example.com');
+    const [address, setAddress] = useState('123 Main St, Springfield');
+    const [detailedAddress, setDetailedAddress] = useState('Apartment 4B');
+    const [gender, setGender] = useState('Male');
+    const [age, setAge] = useState(30);
+    const [bankName, setBankName] = useState('KB국민은행');
+    const [accountNumber, setAccountNumber] = useState('123-456-7890');
     const [verificationCode, setVerificationCode] = useState('');
     const [isVerificationRequested, setIsVerificationRequested] = useState(false);
-    const [timer, setTimer] = useState(180);
+    const [timer, setTimer] = useState(180); // 3분 = 180초
 
-    useEffect(() => {
-        const fetchUserProfile = async () => {
-            try {
-                const response = await axios.get(`http://localhost:8090/api/profile?userno=${userno}`);
-                const data = response.data;
+    const navigate = useNavigate(); // useNavigate 훅 초기화
 
-                setName(data.name);
-                setEmail(data.email);
-                setAddress(data.addr1);
-                setDetailedAddress(data.addr2);
-                setExtraAddress(data.extraAddress);
-                setGender(data.sex);
-                setAge(data.age);
-                setBankName(data.bank);
-                setAccountNumber(data.account);
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        };
-
-        fetchUserProfile();
-    }, [userno]);
-
-    useEffect(() => {
-        // 카카오 주소 검색 API 스크립트 로드
-        const script = document.createElement("script");
-        script.src = "https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
-        script.async = true;
-        document.head.appendChild(script);
-
-        script.onload = () => {
-            console.log("Daum Postcode script loaded");
-        };
-
-        return () => {
-            document.head.removeChild(script);
-        };
-    }, []);
-
+    // 인증 요청 버튼을 누를 때 실행되는 함수
     const handleVerificationRequest = () => {
         setIsVerificationRequested(true);
         setVerificationCode('');
-        setTimer(180);
+        setTimer(180); // 3분 타이머 시작
 
+        // 타이머 감소 로직
         const countdown = setInterval(() => {
             setTimer((prevTimer) => {
                 if (prevTimer <= 1) {
@@ -79,62 +39,18 @@ const EditProfile = () => {
         }, 1000);
     };
 
-    const handleAddressSearch = () => {
-        if (window.daum && window.daum.Postcode) {
-            new window.daum.Postcode({
-                oncomplete: (data) => {
-                    let addr = ''; // 주소 변수
-                    let extraAddr = ''; // 참고항목 변수
+    const handleSave = () => {
+        console.log('저장된 정보:', { name, email, address, detailedAddress, gender, age, bankName, accountNumber, verificationCode });
+        
+        // 수정 완료 알림 팝업
+        alert('수정완료 되었습니다.');
 
-                    if (data.userSelectedType === 'R') {
-                        addr = data.roadAddress;
-                    } else {
-                        addr = data.jibunAddress;
-                    }
-
-                    if (data.userSelectedType === 'R') {
-                        if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-                            extraAddr += data.bname;
-                        }
-                        if (data.buildingName !== '' && data.apartment === 'Y') {
-                            extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
-                        }
-                        if (extraAddr !== '') {
-                            extraAddr = ' (' + extraAddr + ')';
-                        }
-                    }
-
-                    setAddress(addr);
-                    setExtraAddress(extraAddr);
-                    setDetailedAddress(''); // 상세주소를 빈칸으로 리셋
-                    document.getElementById("detailedAddress").focus(); // 상세주소 입력 필드에 포커스
-                }
-            }).open();
-        } else {
-            console.error('Daum Postcode script is not loaded.');
-        }
+        // 이메일을 URL 파라미터로 포함시켜 view-profile 페이지로 이동
+        navigate(`/view-profile/${email}`);
     };
 
-    const handleSave = async () => {
-        try {
-            await axios.post(`http://localhost:8090/api/profile/${userno}`, {
-                name,
-                email,
-                addr1: address,
-                addr2: detailedAddress,
-                sex: gender,
-                age,
-                bank: bankName,
-                account: accountNumber,
-                verificationCode
-            });
-
-            alert('수정완료 되었습니다.');
-            navigate(`/view-profile/${userno}`);
-        } catch (error) {
-            console.error('Error saving profile data:', error);
-            alert('정보 수정 중 오류가 발생했습니다.');
-        }
+    const handleAddressSearch = () => {
+        console.log('주소 찾기 클릭됨');
     };
 
     return (
@@ -158,6 +74,7 @@ const EditProfile = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     sx={{ mt: 2, width: '100%' }}
                 />
+
                 <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
                     <TextField
                         id="address"
@@ -183,6 +100,7 @@ const EditProfile = () => {
                         주소찾기
                     </MuiButton>
                 </Box>
+
                 <TextField
                     id="detailedAddress"
                     label="상세주소"
@@ -202,6 +120,7 @@ const EditProfile = () => {
                 >
                     <MenuItem value="Male">Male</MenuItem>
                     <MenuItem value="Female">Female</MenuItem>
+                    <MenuItem value="Other">Other</MenuItem>
                 </TextField>
                 <TextField
                     id="age"
@@ -212,6 +131,7 @@ const EditProfile = () => {
                     type="number"
                     sx={{ mt: 2, width: '100%' }}
                 />
+
                 <TextField
                     id="bankName"
                     label="은행 이름"
@@ -230,6 +150,8 @@ const EditProfile = () => {
                     <MenuItem value="카카오뱅크">카카오뱅크</MenuItem>
                     <MenuItem value="케이뱅크">케이뱅크</MenuItem>
                 </TextField>
+
+                {/* 계좌 번호 필드와 인증 요청 버튼 */}
                 <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
                     <TextField
                         id="accountNumber"
@@ -237,7 +159,7 @@ const EditProfile = () => {
                         variant="standard"
                         value={accountNumber}
                         onChange={(e) => setAccountNumber(e.target.value)}
-                        sx={{ width: '70%' }}
+                        sx={{ width: '80%' }}
                     />
                     <MuiButton
                         variant="contained"
@@ -248,44 +170,47 @@ const EditProfile = () => {
                             "&:hover": {
                                 backgroundColor: "rgb(120, 140, 200)",
                             },
-                            width: "125px"
+                            width: "150px"
                         }}
                         onClick={handleVerificationRequest}
                     >
-                        인증하기
+                        인증 요청
                     </MuiButton>
                 </Box>
+
+                {/* 인증번호 입력 필드 (인증 요청 후 나타남) */}
                 {isVerificationRequested && (
-                    <Box sx={{ mt: 2, display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
                         <TextField
                             id="verificationCode"
-                            label="인증 코드"
+                            label="인증번호 입력"
                             variant="standard"
                             value={verificationCode}
                             onChange={(e) => setVerificationCode(e.target.value)}
                             sx={{ width: '70%' }}
                         />
-                        <Box sx={{ ml: 2 }}>
-                            <span>타이머: {Math.floor(timer / 60)}:{timer % 60 < 10 ? `0${timer % 60}` : timer % 60}</span>
-                        </Box>
+                        <Typography sx={{ ml: 2, color: 'red' }}>
+                            {`${Math.floor(timer / 60)}:${String(timer % 60).padStart(2, '0')}`}
+                        </Typography>
                     </Box>
                 )}
-                {/* 저장 버튼을 중앙에 위치시키기 위한 Box */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 2 }}>
-                    <MuiButton
-                        variant="contained"
-                        sx={{
-                            backgroundColor: "rgb(148, 160, 227)",
-                            color: "white",
-                            "&:hover": {
-                                backgroundColor: "rgb(120, 140, 200)",
-                            }
-                        }}
-                        onClick={handleSave}
-                    >
-                        저장
-                    </MuiButton>
-                </Box>
+
+                <MuiButton
+                    variant="contained"
+                    sx={{
+                        mt: 3,
+                        backgroundColor: "rgb(148, 160, 227)",
+                        color: "white",
+                        "&:hover": {
+                            backgroundColor: "rgb(120, 140, 200)",
+                        },
+                        width: "150px",
+                        alignSelf: "center",
+                    }}
+                    onClick={handleSave}
+                >
+                    수정
+                </MuiButton>
             </div>
             <Footer />
         </div>

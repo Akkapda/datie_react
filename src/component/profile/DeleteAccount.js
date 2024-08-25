@@ -4,8 +4,8 @@ import Header from '../Header';
 import Footer from '../Footer';
 import { Button as MuiButton, Typography, Box, TextField } from '@mui/material';
 import axios from 'axios';
-import '../../index.css'; // 전역 스타일을 먼저 import
-import './ViewProfile.css'; // 컴포넌트별 스타일을 나중에 import
+import '../../index.css';
+import './ViewProfile.css';
 
 const DeleteAccount = () => {
     const { userno } = useParams(); // URL 파라미터에서 userno 추출
@@ -33,10 +33,8 @@ const DeleteAccount = () => {
             if (user.cardno === 0) {
                 if (window.confirm('정말로 회원 탈퇴를 하시겠습니까?')) {
                     try {
-                        await axios.delete(`http://localhost:8090/api/delete/${userno}`, {
-                            data: {
-                                currentPassword: currentPassword
-                            }
+                        await axios.post(`http://localhost:8090/api/delete/${userno}`, {
+                            currentPassword: currentPassword
                         });
                         alert('회원 탈퇴가 완료되었습니다.');
                         navigate('/login');

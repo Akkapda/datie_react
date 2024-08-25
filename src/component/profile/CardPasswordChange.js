@@ -1,28 +1,17 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // useNavigate 추가
 import Header from '../Header'; 
 import Footer from '../Footer';
 import { TextField, Button as MuiButton, Box, Typography } from '@mui/material';
 import './CardPasswordChange.css'; // 스타일 시트 필요에 따라 추가
-import axios from 'axios'; // Axios 추가
 
 const CardPasswordChange = () => {
-    const { userno } = useParams();
-    const navigate = useNavigate(); // useNavigate 훅 사용
-    console.log('Userno from URL:', userno); // 디버깅을 위한 콘솔 로그
-
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const handlePasswordChange = async () => {
-        if (!userno) {
-            setError('유저 번호가 없습니다.');
-            return;
-        }
-
+    const handlePasswordChange = () => {
         if (newPassword.length !== 4 || confirmPassword.length !== 4) {
             setError('비밀번호는 정확히 4자리여야 합니다.');
             return;
@@ -32,29 +21,11 @@ const CardPasswordChange = () => {
             return;
         }
         setError('');
-    
-        try {
-            const response = await axios.post(`http://localhost:8090/api/changepassword/${userno}`, {
-                currentPassword,
-                newPassword
-            }, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-    
-            setSuccess(response.data);
-            
-            // 비밀번호 변경 성공 시, 프로필 페이지로 이동
-            navigate(`/view-profile/${userno}`);
+        // 비밀번호 변경 요청 로직을 여기에 추가합니다.
+        // 예: API 호출
 
-        } catch (error) {
-            if (error.response) {
-                setError(error.response.data);
-            } else {
-                setError('비밀번호 변경에 실패했습니다.');
-            }
-        }
+        // 성공 메시지
+        setSuccess('비밀번호가 성공적으로 변경되었습니다.');
     };
 
     return (
