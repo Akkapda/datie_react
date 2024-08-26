@@ -1,35 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../Header'; 
 import Footer from '../Footer';
 import { Button as MuiButton, Box, Typography, TextField } from '@mui/material';
-import './CardCancellation.css'; // 스타일 시트 필요에 따라 추가
+import axios from 'axios';
+import './CardCancellation.css'; 
 
 const CardCancellation = () => {
-    const [isCancelled, setIsCancelled] = useState(false); // 카드 해지 상태 (기본값은 해지되지 않은 상태)
-    const [isPasswordPrompt, setIsPasswordPrompt] = useState(false); // 비밀번호 입력 폼 표시 여부
+    const { userno } = useParams();
+    const navigate = useNavigate();
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
+    const [isCancelled, setIsCancelled] = useState(false);
 
-    const handleCancelCard = () => {
-        setIsPasswordPrompt(true); // 비밀번호 입력 폼을 표시
-    };
-
-    const handlePasswordSubmit = () => {
-        // 비밀번호 확인 로직을 여기에 추가합니다.
-        const correctPassword = "yourCorrectPassword"; // 실제 비밀번호를 확인할 로직 추가 필요
-
-        if (password !== correctPassword || confirmPassword !== correctPassword) {
-            setError('비밀번호가 틀립니다.');
+    const handlePasswordSubmit = async () => {
+        if (password !== confirmPassword) {
+            setError('비밀번호가 일치하지 않습니다.');
             setSuccess('');
             return;
         }
 
-        setIsCancelled(true); // 상태 업데이트: 해지됨
-        setSuccess('카드가 성공적으로 해지되었습니다.');
-        setError('');
-        setIsPasswordPrompt(false);
+        try {
+            const response = await axios.post(`http://localhost:8090/api/card-cancel/${userno}`, {
+                userno: userno,
+                cardno: 0,
+                status: 3, // 상태 3은 카드 해지로 간주
+                currentPassword: password
+            });
+
+            if (response.status === 200) {
+                setIsCancelled(true);
+                setSuccess('카드가 성공적으로 해지되었습니다.');
+                setError('');
+            } else {
+                setError('카드 해지에 실패했습니다.');
+                setSuccess('');
+            }
+        } catch (error) {
+            console.error('Error cancelling card:', error);
+            setError('카드 해지에 실패했습니다.');
+            setSuccess('');
+        }
     };
 
     return (
@@ -42,26 +55,7 @@ const CardCancellation = () => {
                         {isCancelled ? '카드가 해지된 상태입니다.' : '카드 해지 신청을 할 수 있습니다.'}
                     </Typography>
 
-                    {!isCancelled && !isPasswordPrompt && (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                            <MuiButton
-                                variant="contained"
-                                sx={{
-                                    backgroundColor: "rgb(148, 160, 227)",
-                                    color: "white",
-                                    "&:hover": {
-                                        backgroundColor: "rgb(120, 140, 200)",
-                                    },
-                                    width: "150px"
-                                }}
-                                onClick={handleCancelCard}
-                            >
-                                카드 해지 신청
-                            </MuiButton>
-                        </Box>
-                    )}
-
-                    {isPasswordPrompt && (
+                    {!isCancelled && (
                         <Box sx={{ mt: 2, width: '100%', textAlign: 'center' }}>
                             <TextField
                                 label="현재 비밀번호"

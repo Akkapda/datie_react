@@ -13,9 +13,7 @@ const ViewProfile = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [profileImageUrl, setProfileImageUrl] = useState(
-        '/default-avatar.png',
-    );
+    const [profileImageUrl, setProfileImageUrl] = useState('/default-avatar.png');
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null); // State for preview URL
 
@@ -81,6 +79,19 @@ const ViewProfile = () => {
 
     const handleCardCancellation = () => {
         navigate(`/card-cancellation/${userno}`);
+    };
+
+    const handleDeleteAccount = async () => {
+        if (window.confirm('정말로 회원 탈퇴를 하시겠습니까?')) {
+            try {
+                await axios.post(`http://localhost:8090/api/delete/${userno}`);
+                alert('회원 탈퇴가 완료되었습니다.');
+                navigate('/login');
+            } catch (error) {
+                console.error('Error deleting account:', error);
+                alert('회원 탈퇴에 실패했습니다.');
+            }
+        }
     };
 
     const handleFileChange = (event) => {
@@ -355,6 +366,19 @@ const ViewProfile = () => {
                             onClick={handleEdit}
                         >
                             내 정보수정
+                        </MuiButton>
+                        <MuiButton
+                            variant="contained"
+                            sx={{
+                                backgroundColor: 'rgb(255, 0, 0)',
+                                '&:hover': {
+                                    backgroundColor: 'rgb(200, 0, 0)',
+                                },
+                                width: '100%',
+                            }}
+                            onClick={handleDeleteAccount}
+                        >
+                            회원 탈퇴
                         </MuiButton>
                     </Box>
                 </Box>
