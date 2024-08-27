@@ -65,7 +65,7 @@ const ViewProfile = () => {
         }
     }, [selectedFile]);
 
-    const handleEdit = () => {
+    const handleEdit = () => { 
         navigate(`/edit-profile/${userno}`);
     };
 
@@ -84,7 +84,13 @@ const ViewProfile = () => {
     const handleDeleteAccount = async () => {
         if (window.confirm('정말로 회원 탈퇴를 하시겠습니까?')) {
             try {
-                await axios.post(`http://localhost:8090/api/delete/${userno}`);
+                const deleteData = {
+                    userno: userno,
+                    cardno: 0, // 필요한 경우 다른 cardno 값
+                    status: 0 // 필요한 경우 다른 status 값
+                };
+    
+                await axios.post(`http://localhost:8090/api/delete/${userno}`, deleteData);
                 alert('회원 탈퇴가 완료되었습니다.');
                 navigate('/login');
             } catch (error) {
@@ -93,7 +99,7 @@ const ViewProfile = () => {
             }
         }
     };
-
+    
     const handleFileChange = (event) => {
         setSelectedFile(event.target.files[0]);
     };
