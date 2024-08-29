@@ -1,19 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom'; // useParams 추가
 import Header from '../Header'; 
 import Footer from '../Footer';
 import { Button as MuiButton, Box, Typography, TextField } from '@mui/material';
-import axios from 'axios';
-import './CardCancellation.css'; 
+import './CardCancellation.css'; // 스타일 시트 필요에 따라 추가
+import axios from 'axios'; // Axios 추가
 
 const CardCancellation = () => {
-    const { userno } = useParams();
-    const navigate = useNavigate();
+    const { userno } = useParams(); // useParams로 userno 받아오기
+    const [isCancelled, setIsCancelled] = useState(false); // 카드 해지 상태 (기본값은 해지되지 않은 상태)
+    const [isPasswordPrompt, setIsPasswordPrompt] = useState(false); // 비밀번호 입력 폼 표시 여부
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
-    const [isCancelled, setIsCancelled] = useState(false);
+
+    const handleCancelCard = () => {
+        setIsPasswordPrompt(true); // 비밀번호 입력 폼을 표시
+    };
 
     const handlePasswordSubmit = async () => {
         if (password !== confirmPassword) {
@@ -23,24 +27,21 @@ const CardCancellation = () => {
         }
 
         try {
-            const response = await axios.post(`http://localhost:8090/api/card-cancel/${userno}`, {
-                userno: userno,
-                cardno: 0,
-                status: 3, // 상태 3은 카드 해지로 간주
+            const response = await axios.post(`http://localhost:8090/api/cancelcard/${userno}`, {
                 currentPassword: password
             });
 
-            if (response.status === 200) {
-                setIsCancelled(true);
-                setSuccess('카드가 성공적으로 해지되었습니다.');
-                setError('');
+            setSuccess(response.data);
+            setError('');
+            setIsCancelled(true); // 카드 상태를 해지된 상태로 설정
+            setIsPasswordPrompt(false); // 비밀번호 입력 폼 숨김
+
+        } catch (error) {
+            if (error.response && error.response.data) {
+                setError(error.response.data);
             } else {
                 setError('카드 해지에 실패했습니다.');
-                setSuccess('');
             }
-        } catch (error) {
-            console.error('Error cancelling card:', error);
-            setError('카드 해지에 실패했습니다.');
             setSuccess('');
         }
     };
@@ -55,7 +56,26 @@ const CardCancellation = () => {
                         {isCancelled ? '카드가 해지된 상태입니다.' : '카드 해지 신청을 할 수 있습니다.'}
                     </Typography>
 
-                    {!isCancelled && (
+                    {!isCancelled && !isPasswordPrompt && (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                            <MuiButton
+                                variant="contained"
+                                sx={{
+                                    backgroundColor: "rgb(148, 160, 227)",
+                                    color: "white",
+                                    "&:hover": {
+                                        backgroundColor: "rgb(120, 140, 200)",
+                                    },
+                                    width: "150px"
+                                }}
+                                onClick={handleCancelCard}
+                            >
+                                카드 해지 신청
+                            </MuiButton>
+                        </Box>
+                    )}
+
+                    {isPasswordPrompt && (
                         <Box sx={{ mt: 2, width: '100%', textAlign: 'center' }}>
                             <TextField
                                 label="현재 비밀번호"
@@ -63,6 +83,7 @@ const CardCancellation = () => {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 sx={{ mb: 2, width: '100%' }}
+                                inputProps={{ maxLength: 4 }} // 비밀번호 최대 길이 4글자 제한
                             />
                             <TextField
                                 label="비밀번호 확인"
@@ -70,6 +91,7 @@ const CardCancellation = () => {
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 sx={{ mb: 2, width: '100%' }}
+                                inputProps={{ maxLength: 4 }} // 비밀번호 확인 최대 길이 4글자 제한
                             />
                             <MuiButton
                                 variant="contained"

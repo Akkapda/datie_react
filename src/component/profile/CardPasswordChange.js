@@ -1,31 +1,47 @@
 import React, { useState } from 'react';
-import Header from '../Header'; 
+import { useParams, useNavigate } from 'react-router-dom';
+import Header from '../Header';
 import Footer from '../Footer';
 import { TextField, Button as MuiButton, Box, Typography } from '@mui/material';
-import './CardPasswordChange.css'; // 스타일 시트 필요에 따라 추가
+import axios from 'axios';
 
 const CardPasswordChange = () => {
+    const { userno } = useParams();
+    const navigate = useNavigate();
+
+    // State 관리
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
-    const handlePasswordChange = () => {
-        if (newPassword.length !== 4 || confirmPassword.length !== 4) {
-            setError('비밀번호는 정확히 4자리여야 합니다.');
-            return;
-        }
+    // 비밀번호 변경 처리 함수
+    const handlePasswordChange = async () => {
         if (newPassword !== confirmPassword) {
             setError('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
             return;
         }
-        setError('');
-        // 비밀번호 변경 요청 로직을 여기에 추가합니다.
-        // 예: API 호출
 
-        // 성공 메시지
-        setSuccess('비밀번호가 성공적으로 변경되었습니다.');
+        try {
+            const response = await axios.post(`http://localhost:8090/api/changepassword//${userno}`, {
+                userno,
+                currentPassword,
+                newPassword,
+            });
+
+            setSuccess('비밀번호가 성공적으로 변경되었습니다.');
+            setError('');
+
+            // 비밀번호 변경 성공 시, 프로필 페이지로 이동
+            navigate(`/view-profile/${userno}`);
+        } catch (error) {
+            if (error.response && error.response.data) {
+                setError(error.response.data);
+            } else {
+                setError('비밀번호 변경에 실패했습니다.');
+            }
+        }
     };
 
     return (
@@ -64,7 +80,6 @@ const CardPasswordChange = () => {
                         inputProps={{ maxLength: 4 }} // 입력 길이 제한
                         sx={{ mt: 2, width: '100%' }}
                     />
-
                     {error && (
                         <Typography sx={{ mt: 2, color: 'red', textAlign: 'center' }}>
                             {error}
@@ -75,7 +90,6 @@ const CardPasswordChange = () => {
                             {success}
                         </Typography>
                     )}
-
                     <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                         <MuiButton
                             variant="contained"
